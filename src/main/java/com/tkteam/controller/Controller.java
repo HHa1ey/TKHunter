@@ -325,7 +325,6 @@ public class Controller {
                     }
                     String component = "name:" + component_name + "\tversion:" + component_version;
                     jsonBean.setId(num_id);
-                    System.out.println(num_id);
                     jsonBean.setUrl(arr_json_element.getString("url"));
                     jsonBean.setIp(arr_json_element.getString("ip"));
                     jsonBean.setPort(arr_json_element.getString("port"));
