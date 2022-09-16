@@ -1,6 +1,7 @@
-# 介绍 
+# 项目介绍 
 TKHunter是一款Hunter资产测绘平台的图形化工具（深信服深蓝实验室天魁战队）
 
+PS：时间仓促，欢迎师傅们提issues（QAQ）
 ![1](https://user-images.githubusercontent.com/113674835/190614605-fdd118e1-bb50-4ff8-9ee3-b12364eba497.png)
 
 # 参考资料
