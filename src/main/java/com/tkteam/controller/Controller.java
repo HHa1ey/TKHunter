@@ -2,64 +2,52 @@ package com.tkteam.controller;
 
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
+import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;;
 import com.jfoenix.controls.JFXDatePicker;
 import com.jfoenix.controls.JFXTextField;
 import com.tkteam.bean.ColumnBean;
 import com.tkteam.bean.JsonBean;
 import com.tkteam.hunter.HunterSearch;
-import com.tkteam.start.MainStart;
 import com.tkteam.utils.ResultTool;
 import javafx.animation.PauseTransition;
-import javafx.application.Platform;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
-import javafx.event.ActionEvent;
-import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.Window;
-import javafx.util.Callback;
 import javafx.util.Duration;
 
-import javax.swing.*;
-import javax.swing.plaf.IconUIResource;
 import java.awt.*;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.awt.event.MouseEvent;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URL;
+import java.net.*;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.Base64;
 import java.util.Date;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.function.Consumer;
+import java.util.HashMap;
 
 public class Controller {
+    public static HashMap<String,Object> setProxy=new HashMap<>();
+    @FXML
+    private MenuItem github;
+    @FXML
+    private MenuItem proxy;
+    @FXML
+    private MenuItem apikey;
     @FXML
     private Text result_num;
     @FXML
@@ -86,8 +74,6 @@ public class Controller {
     private TableColumn<JsonBean, String> result_component;
     @FXML
     public TableView<JsonBean> result_table;
-    @FXML
-    private TextField hunter_key;                 //hunter的key
     @FXML
     private TextField hunter_search_grammar;      //hunter搜索语法
     @FXML
@@ -205,45 +191,25 @@ public class Controller {
         grammar_explain.setCellValueFactory(new PropertyValueFactory<>("explain"));
         grammar_table.setItems(grammar_list);
 
+        //加载自定义时间范围
+        customDate();
 
-        //自定义时间选项
-        this.hunter_time.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            if (hunter_time.getValue().trim().equals("自定义时间范围")){
-                AnchorPane anchorPane;
-                Stage stage = new Stage();
-                try {
-                    anchorPane = FXMLLoader.load(getClass().getResource("/fxml/Date.fxml"));
+        //加载apikey模块
+        addApiKey();;
 
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-                JFXDatePicker custom_end_time = (JFXDatePicker) anchorPane.lookup("#custom_end_time");
-                JFXDatePicker custom_start_time = (JFXDatePicker) anchorPane.lookup("#custom_start_time");
-                Button callback_button = (Button) anchorPane.lookup("#callback_button");
-                callback_button.setOnAction(event -> {
-                    starttime=custom_start_time.getValue()+"%2000:00:00";
-                    endtime=custom_end_time.getValue()+"%2000:00:00";
-                    this.hunter_time.setValue(custom_start_time.getValue()+"到"+custom_end_time.getValue());
-                    stage.close();          //点击确定关闭stage
-                });
-                stage.setScene(new Scene(anchorPane));
-                stage.setTitle("请选择时间区间");
-                stage.show();
-            }
-        });
+        //加载代理模块
+        addProxy();
 
+        //加载关于
+        getAbout();
     }
 
 
     @FXML
     public void hunterSearch() throws IOException, NoSuchAlgorithmException, NoSuchProviderException, KeyManagementException {
-        //接收前端传参处理
-        if (hunter_key.getText().trim().equals("")){
-            ResultTool.alert("API-Key不能为空！！");
-        }else {
-            this.key=hunter_key.getText().trim();
+        if (key==null){
+            ResultTool.alert("请填写Api-Key!!");
         }
-
         if (hunter_search_grammar.getText().trim().equals("")){
             ResultTool.alert("搜索语法不能为空！！");
         }else {
@@ -252,7 +218,7 @@ public class Controller {
         if (hunter_status_code.getText().equals("默认200 逗号分割")){
             this.code ="200";
         }else {
-            this.code = hunter_status_code.getText();
+            this.code = hunter_status_code.getText().trim();
         }
 
         this.isweb_str = this.hunter_is_web.getValue().trim();
@@ -401,4 +367,172 @@ public class Controller {
         new Thread(task).start();
     }
 
+    //自定义时间
+    private void customDate(){
+        this.hunter_time.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if (hunter_time.getValue().trim().equals("自定义时间范围")){
+                AnchorPane anchorPane;
+                Stage stage = new Stage();
+                try {
+                    anchorPane = FXMLLoader.load(getClass().getResource("/fxml/Date.fxml"));
+
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                JFXDatePicker custom_end_time = (JFXDatePicker) anchorPane.lookup("#custom_end_time");
+                JFXDatePicker custom_start_time = (JFXDatePicker) anchorPane.lookup("#custom_start_time");
+                Button callback_button = (Button) anchorPane.lookup("#callback_button");
+                callback_button.setOnAction(event -> {
+                    starttime=custom_start_time.getValue()+"%2000:00:00";
+                    endtime=custom_end_time.getValue()+"%2000:00:00";
+                    this.hunter_time.setValue(custom_start_time.getValue()+"到"+custom_end_time.getValue());
+                    stage.close();          //点击确定关闭stage
+                });
+                stage.setScene(new Scene(anchorPane));
+                stage.setTitle("请选择时间区间");
+                stage.show();
+            }
+        });
+    }
+
+    //apikey模块
+    private void addApiKey(){
+        apikey.setOnAction(event -> {
+            AnchorPane api_key_pane;
+            Stage api_key_stage = new Stage();
+            try {
+                api_key_pane=FXMLLoader.load(getClass().getResource("/fxml/ApiKey.fxml"));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            Button backbutton = (Button)api_key_pane.lookup("#key_back");
+            TextField hunter_key = (TextField) api_key_pane.lookup("#hunter_key");
+            backbutton.setOnAction(event1 -> {
+                key=hunter_key.getText().trim();
+                if (key.equals("")){
+                    ResultTool.alert("请填写Api-Key!!");
+                }else {
+                    api_key_stage.close();
+                }
+            });
+            hunter_key.setText(key);
+            api_key_stage.setScene(new Scene(api_key_pane));
+            api_key_stage.setTitle("填写Api-Key");
+            api_key_stage.show();
+        });
+    }
+
+    //代理模块
+    private void addProxy(){
+        AnchorPane proxy_pane;
+        ToggleGroup toggleGroup = new ToggleGroup();
+        try {
+            proxy_pane = FXMLLoader.load(getClass().getResource("/fxml/Proxy.fxml"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        TextField field_ip = (TextField) proxy_pane.lookup("#autoproxy_ip");
+        TextField field_port = (TextField) proxy_pane.lookup("#autoproxy_port");
+        TextField field_user = (TextField) proxy_pane.lookup("#autoproxy_user");
+        TextField field_pass = (TextField) proxy_pane.lookup("#autoproxy_pass");
+
+        RadioButton rb_enable = (RadioButton) proxy_pane.lookup("#proxy_enable");
+        RadioButton rb_disable = (RadioButton) proxy_pane.lookup("#proxy_disable");
+
+        ComboBox<String> proxy_cbb = (ComboBox<String>)proxy_pane.lookup("#choose_proxy");
+
+        JFXButton cancel_button = (JFXButton) proxy_pane.lookup("#cancel_button");
+        JFXButton save_button =(JFXButton) proxy_pane.lookup("#save_button");
+        proxy.setOnAction(event -> {
+            Alert dialog = new Alert(Alert.AlertType.NONE);
+            dialog.setResizable(true);
+            dialog.setTitle("设置代理");
+            Window window = dialog.getDialogPane().getScene().getWindow();
+            window.setOnCloseRequest((e) -> {
+                window.hide();
+            });
+
+            //开启or关闭
+            rb_enable.setToggleGroup(toggleGroup);
+            rb_disable.setSelected(true);
+            rb_disable.setToggleGroup(toggleGroup);
+            //代理类型选择
+
+            proxy_cbb.setItems(FXCollections.observableArrayList("HTTP","SOCKS"));
+            proxy_cbb.getSelectionModel().select(0);
+
+            if (setProxy.get("proxy")!=null){
+                Proxy curr_proxy = (Proxy) setProxy.get("proxy");
+                String proxy_info = curr_proxy.address().toString();
+                String[] info = proxy_info.split(":");
+                String ipaddr = info[0].replace("/","");
+                String port = info[1];
+                field_port.setText(port);
+                field_ip.setText(ipaddr);
+                rb_enable.setSelected(true);
+            }else {
+                rb_disable.setSelected(true);
+            }
+
+
+            //保存代理参数
+            save_button.setOnAction(event1 -> {
+                String proxy_ip = field_ip.getText().trim();
+                String proxy_port = field_port.getText().trim();
+                String proxy_user = field_user.getText().trim();
+                String proxy_pass = field_pass.getText().trim();
+                if (rb_disable.isSelected()){
+                    setProxy.put("proxy",null);
+                }else {
+                    if (!proxy_user.equals("")){
+                        Authenticator.setDefault(new Authenticator() {
+                            @Override
+                            protected PasswordAuthentication getPasswordAuthentication() {
+                                return new PasswordAuthentication(proxy_user,proxy_pass.toCharArray());
+                            }
+                        });
+                    }else {
+                        Authenticator.setDefault(null);
+                    }
+                    setProxy.put("username",proxy_user);
+                    setProxy.put("password",proxy_pass);
+                    InetSocketAddress socketAddress = new InetSocketAddress(proxy_ip,Integer.parseInt(proxy_port));
+                    Proxy proxy;
+                    if (proxy_cbb.getValue().equals("HTTP")){
+                        proxy = new Proxy(Proxy.Type.HTTP,socketAddress);
+                        setProxy.put("proxy",proxy);
+                    } else if (proxy_cbb.getValue().equals("SOCKS")) {
+                        proxy = new Proxy(Proxy.Type.SOCKS,socketAddress);
+                        setProxy.put("proxy",proxy);
+                    }
+                    field_ip.setText(proxy_ip);
+                    field_port.setText(proxy_port);
+                    dialog.getDialogPane().getScene().getWindow().hide();
+                }
+            });
+
+            //不保存
+            cancel_button.setOnAction(event1 -> {
+                dialog.getDialogPane().getScene().getWindow().hide();
+            });
+            dialog.getDialogPane().setContent(proxy_pane);
+            dialog.showAndWait();
+        });
+    }
+
+    //关于模块
+    private void getAbout(){
+        github.setOnAction(event -> {
+            URI uri = URI.create("https://github.com/HHa1ey/TKHunter");
+            Desktop desktop = Desktop.getDesktop();
+            if (desktop.isSupported(Desktop.Action.BROWSE)) {
+                try {
+                    desktop.browse(uri);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
 }
