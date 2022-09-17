@@ -1,6 +1,7 @@
 package com.tkteam.utils;
 
 import com.tkteam.bean.Response;
+import com.tkteam.controller.Controller;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -11,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.Proxy;
 import java.net.URL;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
@@ -30,6 +32,11 @@ public class HttpTool {
         HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory());
         URL url_obj = new URL(url);
         HttpURLConnection url_conn = (HttpURLConnection) url_obj.openConnection();
+
+        Proxy proxy = (Proxy) Controller.setProxy.get("proxy");
+        if (proxy != null){
+            url_conn = (HttpURLConnection)url_obj.openConnection(proxy);
+        }
         url_conn.setRequestProperty("User-Agent", UserAgentTools.getRandomUA());
         url_conn.setConnectTimeout(10000);
         url_conn.setUseCaches(false);
