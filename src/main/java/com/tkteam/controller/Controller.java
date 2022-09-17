@@ -30,7 +30,7 @@ import javafx.stage.Window;
 import javafx.util.Duration;
 
 import java.awt.*;
-import java.io.IOException;
+import java.io.*;
 import java.net.*;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
@@ -39,6 +39,7 @@ import java.text.SimpleDateFormat;
 import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Properties;
 
 public class Controller {
     public static HashMap<String,Object> setProxy=new HashMap<>();
@@ -207,7 +208,7 @@ public class Controller {
 
     @FXML
     public void hunterSearch() throws IOException, NoSuchAlgorithmException, NoSuchProviderException, KeyManagementException {
-        if (key==null){
+        if (key.equals("")){
             ResultTool.alert("请填写Api-Key!!");
         }
         if (hunter_search_grammar.getText().trim().equals("")){
@@ -397,29 +398,70 @@ public class Controller {
 
     //apikey模块
     private void addApiKey(){
+        AnchorPane api_key_pane;
+        try {
+            api_key_pane=FXMLLoader.load(getClass().getResource("/fxml/ApiKey.fxml"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        JFXButton backbutton = (JFXButton)api_key_pane.lookup("#key_back");
+        JFXButton cancelbutton = (JFXButton)api_key_pane.lookup("#cancel_button");
+        TextField hunter_key = (TextField) api_key_pane.lookup("#hunter_key");
         apikey.setOnAction(event -> {
-            AnchorPane api_key_pane;
-            Stage api_key_stage = new Stage();
+            Alert api_key_dialog = new Alert(Alert.AlertType.NONE);
+            api_key_dialog.setResizable(true);
+            api_key_dialog.setTitle("设置Api-Key");
+            Window window = api_key_dialog.getDialogPane().getScene().getWindow();
+            window.setOnCloseRequest((e) -> {
+                window.hide();
+            });
+            //判断读取本地文件中的key
+            File key_file = new File("Hunter.properties");
+            Properties properties = new Properties();
+            if (!key_file.exists()){
+                try {
+                    properties.setProperty("Hunter_Key","");
+                    properties.store(new FileWriter(key_file),null);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                ResultTool.alert("未检测到存在Key配置文件，已自动创建");
+            }
             try {
-                api_key_pane=FXMLLoader.load(getClass().getResource("/fxml/ApiKey.fxml"));
+                FileInputStream fis = new FileInputStream("Hunter.properties");
+                properties.load(fis);
+                fis.close();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-            Button backbutton = (Button)api_key_pane.lookup("#key_back");
-            TextField hunter_key = (TextField) api_key_pane.lookup("#hunter_key");
+            if (!properties.getProperty("Hunter_Key").equals("")){
+                hunter_key.setText(properties.getProperty("Hunter_Key"));
+            }
             backbutton.setOnAction(event1 -> {
+                key=properties.getProperty("Hunter_Key");
                 key=hunter_key.getText().trim();
-                if (key.equals("")){
-                    ResultTool.alert("请填写Api-Key!!");
+                if (!key.equals("")){
+                    properties.setProperty("Hunter_Key",key);
+                    try {
+                        properties.store(new FileWriter(key_file),null);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                    api_key_dialog.getDialogPane().getScene().getWindow().hide();
                 }else {
-                    api_key_stage.close();
+                    ResultTool.alert("请填写Api-Key!!");
                 }
             });
-            hunter_key.setText(key);
-            api_key_stage.setScene(new Scene(api_key_pane));
-            api_key_stage.setTitle("填写Api-Key");
-            api_key_stage.show();
+
+            cancelbutton.setOnAction(event1 -> {
+                api_key_dialog.getDialogPane().getScene().getWindow().hide();
+            });
+
+            api_key_dialog.getDialogPane().setContent(api_key_pane);
+            api_key_dialog.showAndWait();
         });
+
+        //写入文件
     }
 
     //代理模块
@@ -508,8 +550,8 @@ public class Controller {
                     }
                     field_ip.setText(proxy_ip);
                     field_port.setText(proxy_port);
-                    dialog.getDialogPane().getScene().getWindow().hide();
                 }
+                dialog.getDialogPane().getScene().getWindow().hide();
             });
 
             //不保存

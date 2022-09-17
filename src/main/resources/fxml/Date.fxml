@@ -6,7 +6,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane prefHeight="380.0" prefWidth="344.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane prefHeight="380.0" prefWidth="344.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" stylesheets="/css/main.css">
    <Text layoutX="21.0" layoutY="222.0" strokeType="OUTSIDE" strokeWidth="0.0" text="结束时间：">
       <font>
          <Font size="18.0" />
