@@ -3,32 +3,61 @@ package com.tkteam.controller;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.jfoenix.controls.JFXComboBox;;
+import com.jfoenix.controls.JFXDatePicker;
 import com.jfoenix.controls.JFXTextField;
 import com.tkteam.bean.ColumnBean;
 import com.tkteam.bean.JsonBean;
 import com.tkteam.hunter.HunterSearch;
+import com.tkteam.start.MainStart;
 import com.tkteam.utils.ResultTool;
 import javafx.animation.PauseTransition;
+import javafx.application.Platform;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
+import javafx.event.ActionEvent;
+import javafx.event.EventType;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import javafx.stage.Stage;
+import javafx.stage.Window;
+import javafx.util.Callback;
 import javafx.util.Duration;
 
+import javax.swing.*;
+import javax.swing.plaf.IconUIResource;
 import java.awt.*;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URL;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.Base64;
 import java.util.Date;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.function.Consumer;
 
 public class Controller {
     @FXML
@@ -57,7 +86,6 @@ public class Controller {
     private TableColumn<JsonBean, String> result_component;
     @FXML
     public TableView<JsonBean> result_table;
-
     @FXML
     private TextField hunter_key;                 //hunter的key
     @FXML
@@ -74,7 +102,6 @@ public class Controller {
     private TableColumn<ColumnBean, String> grammar_content;       //语法内容
     @FXML
     private TableColumn<ColumnBean, String> grammar_explain;         //语法说明
-
     public static String starttime;
     public static String endtime;
     private String key;
@@ -177,6 +204,34 @@ public class Controller {
         grammar_content.setCellValueFactory(new PropertyValueFactory<>("content"));
         grammar_explain.setCellValueFactory(new PropertyValueFactory<>("explain"));
         grammar_table.setItems(grammar_list);
+
+
+        //自定义时间选项
+        this.hunter_time.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if (hunter_time.getValue().trim().equals("自定义时间范围")){
+                AnchorPane anchorPane;
+                Stage stage = new Stage();
+                try {
+                    anchorPane = FXMLLoader.load(getClass().getResource("/fxml/Date.fxml"));
+
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                JFXDatePicker custom_end_time = (JFXDatePicker) anchorPane.lookup("#custom_end_time");
+                JFXDatePicker custom_start_time = (JFXDatePicker) anchorPane.lookup("#custom_start_time");
+                Button callback_button = (Button) anchorPane.lookup("#callback_button");
+                callback_button.setOnAction(event -> {
+                    starttime=custom_start_time.getValue()+"%2000:00:00";
+                    endtime=custom_end_time.getValue()+"%2000:00:00";
+                    this.hunter_time.setValue(custom_start_time.getValue()+"到"+custom_end_time.getValue());
+                    stage.close();          //点击确定关闭stage
+                });
+                stage.setScene(new Scene(anchorPane));
+                stage.setTitle("请选择时间区间");
+                stage.show();
+            }
+        });
+
     }
 
 
@@ -209,7 +264,6 @@ public class Controller {
             isweb_int = "3";
         }
 
-
         this.bs64_grammar = Base64.getUrlEncoder().encodeToString(grammar.getBytes());
 
 
@@ -230,7 +284,8 @@ public class Controller {
         } else if (hunter_time.getValue().trim().equals("最近一年")) {
             starttime = one_year;
             endtime = now;
-        }
+       }
+
 
         String result_json = new HunterSearch().getResult(key, bs64_grammar, isweb_int, 1, code, starttime, endtime);
 
@@ -342,8 +397,8 @@ public class Controller {
                 return result_list;
             }
         };
-//        task.setOnSucceeded(e -> tableView.getItems().addAll(task.getValue()));
-        tableView.scrollTo(tableView.getItems().size()-10);
+        tableView.scrollTo(tableView.getItems().size()-20);
         new Thread(task).start();
     }
+
 }

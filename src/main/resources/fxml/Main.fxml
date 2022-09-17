@@ -23,10 +23,10 @@
       <JFXComboBox fx:id="hunter_is_web" layoutX="116.0" layoutY="110.0" prefHeight="30.0" prefWidth="157.0" />
       <Text layoutX="34.0" layoutY="135.0" strokeType="OUTSIDE" strokeWidth="0.0" text="资产类型" />
       <Text layoutX="34.0" layoutY="55.0" strokeType="OUTSIDE" strokeWidth="0.0" text="API-KEY" wrappingWidth="69.451171875" />
-      <Text layoutX="339.0" layoutY="132.0" strokeType="OUTSIDE" strokeWidth="0.0" text="资产时间范围" wrappingWidth="115.0" />
-      <JFXComboBox fx:id="hunter_time" layoutX="466.0" layoutY="110.0" prefHeight="30.0" prefWidth="173.0" />
-      <Text layoutX="735.0" layoutY="131.0" strokeType="OUTSIDE" strokeWidth="0.0" text="状态码" wrappingWidth="54.0" />
-      <JFXTextField fx:id="hunter_status_code" layoutX="814.0" layoutY="110.0" prefHeight="30.0" prefWidth="144.0" text="默认200 逗号分割" />
+      <Text layoutX="339.0" layoutY="131.0" strokeType="OUTSIDE" strokeWidth="0.0" text="资产时间范围" wrappingWidth="115.0" />
+      <JFXComboBox fx:id="hunter_time" layoutX="466.0" layoutY="110.0" prefHeight="30.0" prefWidth="252.0" />
+      <Text layoutX="772.0" layoutY="131.0" strokeType="OUTSIDE" strokeWidth="0.0" text="状态码" wrappingWidth="54.0" />
+      <JFXTextField fx:id="hunter_status_code" layoutX="841.0" layoutY="111.0" prefHeight="30.0" prefWidth="144.0" text="默认200 逗号分割" />
       <TextField fx:id="hunter_search_grammar" layoutX="466.0" layoutY="35.0" prefHeight="30.0" prefWidth="460.0" />
       <TextField fx:id="hunter_key" layoutX="116.0" layoutY="35.0" prefHeight="20.0" prefWidth="156.0" />
       <JFXButton layoutX="1058.0" layoutY="31.0" onAction="#hunterSearch" prefHeight="36.0" prefWidth="107.0" text="查询" />
