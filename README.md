@@ -3,6 +3,12 @@ TKHunter是一款Hunter资产测绘平台的图形化工具（深信服深蓝实
 
 PS：时间仓促，欢迎师傅们提issues（QAQ）
 
+![image](https://user-images.githubusercontent.com/113674835/190915582-333c1c44-caa8-497a-b9d6-c0318dfb8867.png)
+
+![image](https://user-images.githubusercontent.com/113674835/190915598-06e69873-21b1-4c8f-a29d-46b9643fa4f8.png)
+
+![image](https://user-images.githubusercontent.com/113674835/190915609-65c969b8-9a45-4965-bb39-5632432225b0.png)
+
 
 
 # 参考资料
@@ -35,4 +41,4 @@ https://qa.1r1g.com/sf/ask/2408064991/
 
 ~~5、API-Key本地文件读取~~
 
-6、添加批量查询接口
+~~6、添加批量查询接口~~
