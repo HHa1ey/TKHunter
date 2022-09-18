@@ -12,8 +12,16 @@ public class JsonBean {
     private  String component;
     private  String company;
     private int id;
+    private String number;
+    private String country;
+    private String province;
+    private String city;
+    private String updated_at;
+    private String is_web;
+    private String as_org;
+    private String isp;
 
-    public JsonBean(int id,String url, String ip, String port, String web_title, String domain, String base_protocol, String protocol, String status_code, String component,String company) {
+    public JsonBean(String number,String country,String province,String city,String updated_at,String is_web,String as_org,String isp,int id,String url, String ip, String port, String web_title, String domain, String base_protocol, String protocol, String status_code, String component,String company) {
         this.id=id;
         this.url = url;
         this.ip = ip;
@@ -25,6 +33,15 @@ public class JsonBean {
         this.protocol = protocol;
         this.base_protocol =base_protocol;
         this.company=company;
+        this.number=number;
+        this.country=country;
+        this.province=province;
+        this.city=city;
+        this.updated_at=updated_at;
+        this.is_web=is_web;
+        this.as_org=as_org;
+        this.isp=isp;
+
     }
 
     public JsonBean() {
@@ -101,4 +118,69 @@ public class JsonBean {
     public int getId() {
         return this.id;
     }
+
+    public String getNumber() {
+        return number;
+    }
+
+    public void setNumber(String number) {
+        this.number = number;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    public String getProvince() {
+        return province;
+    }
+
+    public void setProvince(String province) {
+        this.province = province;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getUpdated_at() {
+        return updated_at;
+    }
+
+    public void setUpdated_at(String updated_at) {
+        this.updated_at = updated_at;
+    }
+
+    public String getIs_web() {
+        return is_web;
+    }
+
+    public void setIs_web(String is_web) {
+        this.is_web = is_web;
+    }
+
+    public String getAs_org() {
+        return as_org;
+    }
+
+    public void setAs_org(String as_org) {
+        this.as_org = as_org;
+    }
+
+    public String getIsp() {
+        return isp;
+    }
+
+    public void setIsp(String isp) {
+        this.isp = isp;
+    }
+
 }

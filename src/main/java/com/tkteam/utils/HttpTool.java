@@ -65,10 +65,13 @@ public class HttpTool {
         return response;
     }
 
-    public Response post(String url,HashMap<String,String> heaers,String postdata) throws NoSuchAlgorithmException, IOException, NoSuchProviderException, KeyManagementException {
+    public static Response post(String url,HashMap<String,String> headers,String postdata) throws NoSuchAlgorithmException, IOException, NoSuchProviderException, KeyManagementException {
         Response response;
         HttpURLConnection connection = getConn(url);
         connection.setRequestMethod("POST");
+        for (String key : headers.keySet()) {
+            connection.setRequestProperty(key, headers.get(key));
+        }
         OutputStream outputStream = connection.getOutputStream();
         outputStream.write(postdata.getBytes());
         outputStream.flush();
@@ -79,7 +82,7 @@ public class HttpTool {
 
 
     public static Response getResponse(HttpURLConnection connection) throws IOException {
-        Response response = new Response(0,null,null,null);
+        Response response = new Response(0,null,null);
         connection.connect();
         response.setCode(connection.getResponseCode());
         response.setHeader(connection.getHeaderFields().toString());

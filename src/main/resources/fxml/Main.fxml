@@ -10,6 +10,7 @@
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
@@ -26,20 +27,33 @@
             <MenuItem fx:id="github" mnemonicParsing="false" text="Github" />
         </Menu>
     </MenuBar>
-   <AnchorPane prefHeight="200.0" prefWidth="200.0">
-      <Text layoutX="345.0" layoutY="57.0" strokeType="OUTSIDE" strokeWidth="0.0" text="查询语法" wrappingWidth="103.0">
+   <AnchorPane prefHeight="170.0" prefWidth="1277.0">
+      <Text layoutX="31.0" layoutY="59.0" strokeType="OUTSIDE" strokeWidth="0.0" text="查询语法：" wrappingWidth="103.0">
          <font>
             <Font size="20.0" />
          </font>
       </Text>
-      <JFXComboBox fx:id="hunter_is_web" layoutX="116.0" layoutY="110.0" prefHeight="30.0" prefWidth="157.0" />
-      <Text layoutX="34.0" layoutY="135.0" strokeType="OUTSIDE" strokeWidth="0.0" text="资产类型" />
-      <Text layoutX="339.0" layoutY="131.0" strokeType="OUTSIDE" strokeWidth="0.0" text="资产时间范围" wrappingWidth="115.0" />
-      <JFXComboBox fx:id="hunter_time" layoutX="466.0" layoutY="110.0" prefHeight="30.0" prefWidth="252.0" />
-      <Text layoutX="772.0" layoutY="131.0" strokeType="OUTSIDE" strokeWidth="0.0" text="状态码" wrappingWidth="54.0" />
-      <JFXTextField fx:id="hunter_status_code" layoutX="841.0" layoutY="111.0" prefHeight="30.0" prefWidth="144.0" text="默认200 逗号分割" />
-      <TextField fx:id="hunter_search_grammar" layoutX="466.0" layoutY="35.0" prefHeight="30.0" prefWidth="460.0" />
-      <JFXButton layoutX="1058.0" layoutY="31.0" onAction="#hunterSearch" prefHeight="36.0" prefWidth="107.0" text="查询" />
+      <JFXComboBox fx:id="hunter_is_web" layoutX="91.0" layoutY="107.0" prefHeight="30.0" prefWidth="157.0" />
+      <Text layoutX="14.0" layoutY="128.0" strokeType="OUTSIDE" strokeWidth="0.0" text="资产类型：">
+         <font>
+            <Font size="16.0" />
+         </font></Text>
+      <Text layoutX="263.0" layoutY="128.0" strokeType="OUTSIDE" strokeWidth="0.0" text="资产时间范围：" wrappingWidth="115.0">
+         <font>
+            <Font size="16.0" />
+         </font></Text>
+      <JFXComboBox fx:id="hunter_time" layoutX="366.0" layoutY="107.0" prefHeight="30.0" prefWidth="242.0" />
+      <Text layoutX="627.0" layoutY="127.0" strokeType="OUTSIDE" strokeWidth="0.0" text="状态码：" wrappingWidth="64.30027428269386">
+         <font>
+            <Font size="16.0" />
+         </font></Text>
+      <JFXTextField fx:id="hunter_status_code" layoutX="691.0" layoutY="107.0" prefHeight="30.0" prefWidth="144.0" text="默认200 逗号分割" />
+      <TextField fx:id="hunter_search_grammar" layoutX="148.0" layoutY="37.0" prefHeight="30.0" prefWidth="460.0" />
+      <JFXButton layoutX="674.0" layoutY="16.0" onAction="#hunterSearch" prefHeight="36.0" prefWidth="89.0" text="查询" />
+      <JFXButton layoutX="1084.0" layoutY="16.0" onAction="#exportCsv" prefHeight="36.0" prefWidth="169.0" text="语法查询结果导出" />
+      <TextArea fx:id="batchArea" layoutX="856.0" layoutY="11.0" prefHeight="132.0" prefWidth="200.0" />
+      <JFXButton layoutX="1084.0" layoutY="86.0" onAction="#batchExport" prefHeight="36.0" prefWidth="169.0" text="批量查询结果导出" />
+      <JFXButton layoutX="674.0" layoutY="59.0" onAction="#batchQuery" prefHeight="36.0" prefWidth="89.0" text="批量查询" />
    </AnchorPane>
    <JFXTabPane prefHeight="649.0" prefWidth="1119.0">
       <Tab text="常用查询语法">

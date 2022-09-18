@@ -5,12 +5,10 @@ public class Response{
     private String header;
     private String text;
 
-    private String error;
-    public Response(int code,String header, String text, String error) {
+    public Response(int code,String header, String text) {
         this.code=code;
         this.header=header;
         this.text=text;
-        this.error=error;
     }
 
     public int getCode() {
@@ -35,14 +33,6 @@ public class Response{
 
     public void setText(String text) {
         this.text = text;
-    }
-
-    public String getError() {
-        return error;
-    }
-
-    public void setError(String error) {
-        this.error = error;
     }
 
 

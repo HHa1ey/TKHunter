@@ -3,12 +3,14 @@ package com.tkteam.controller;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.jfoenix.controls.JFXButton;
-import com.jfoenix.controls.JFXComboBox;;
+import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXDatePicker;
 import com.jfoenix.controls.JFXTextField;
 import com.tkteam.bean.ColumnBean;
 import com.tkteam.bean.JsonBean;
+import com.tkteam.bean.Response;
 import com.tkteam.hunter.HunterSearch;
+import com.tkteam.utils.HttpTool;
 import com.tkteam.utils.ResultTool;
 import javafx.animation.PauseTransition;
 import javafx.collections.FXCollections;
@@ -17,14 +19,16 @@ import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Text;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.util.Duration;
@@ -41,8 +45,13 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Properties;
 
+;
+
 public class Controller {
     public static HashMap<String,Object> setProxy=new HashMap<>();
+    @FXML
+    private TextArea batchArea;
+
     @FXML
     private MenuItem github;
     @FXML
@@ -103,7 +112,13 @@ public class Controller {
     int num_id;
     private String add_result_json;
     ObservableList<JsonBean> result_list = FXCollections.observableArrayList();
+    private final HashMap<String,String> headers=new HashMap<>();
 
+    private AnchorPane api_key_pane;
+
+    private TextField hunter_key;
+
+    private String task_id;
     //is_web选择资产类型
     private static final String[] is_webs = {
             "Web资产",        //1代表web资产
@@ -205,12 +220,23 @@ public class Controller {
         getAbout();
     }
 
-
     @FXML
     public void hunterSearch() throws IOException, NoSuchAlgorithmException, NoSuchProviderException, KeyManagementException {
-        if (key.equals("")){
-            ResultTool.alert("请填写Api-Key!!");
+        if (hunter_key.getText().trim().equals("")){
+            Properties properties = new Properties();
+            try {
+                FileInputStream fis = new FileInputStream("Hunter.properties");
+                properties.load(fis);
+                fis.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            if (!properties.getProperty("Hunter_Key").equals("")){
+                hunter_key.setText(properties.getProperty("Hunter_Key"));
+                key=hunter_key.getText().trim();
+            }else {ResultTool.alert("请填写Api-Key!!");}
         }
+
         if (hunter_search_grammar.getText().trim().equals("")){
             ResultTool.alert("搜索语法不能为空！！");
         }else {
@@ -256,6 +282,10 @@ public class Controller {
 
         String result_json = new HunterSearch().getResult(key, bs64_grammar, isweb_int, 1, code, starttime, endtime);
 
+
+        if (result_json.contains("令牌过期")){
+            ResultTool.alert("令牌过期，请输入有效的Key");
+        }
         //获取查询结果总量
         JSONObject jsonObj_total = JSONObject.parseObject(result_json).getJSONObject("data");
         int total = jsonObj_total.getInteger("total");
@@ -324,6 +354,25 @@ public class Controller {
             }));
         });
         pauseTransition.playFromStart();
+
+    }
+
+    @FXML
+    public void exportCsv() throws IOException {
+        //文件导出实现
+        FileChooser fileChooser = new FileChooser();
+        FileChooser.ExtensionFilter extensionFilter = new FileChooser.ExtensionFilter("CSV files (*.csv)", "*.csv");
+        fileChooser.setTitle("选择导出CSV路径");
+        fileChooser.getExtensionFilters().add(extensionFilter);
+        File file = fileChooser.showSaveDialog(new Stage());
+        Writer writer = new BufferedWriter(new FileWriter(file));
+        writer.write("URL"+","+"IP"+","+"端口"+","+"Web_title"+","+"domain"+","+"protocol"+","+"base_protocol"+","+"状态码"+","+"中间件"+","+"ICP公司名"+","+"备案号"+","+"国家"+","+"省"+","+"市"+","+"更新时间"+","+"是否是Web资产"+","+"as_org"+","+"ISP"+"\n");
+        for (JsonBean bean : result_list){
+            String csv_info = bean.getUrl()+","+bean.getIp()+","+bean.getPort()+","+bean.getWeb_title()+","+bean.getDomain()+","+bean.getProtocol()+","+bean.getBase_protocol()+","+bean.getStatus_code()+","+bean.getComponent()+","+bean.getCompany()+","+bean.getNumber()+","+bean.getCountry()+","+bean.getProvince()+","+bean.getCity()+","+bean.getUpdated_at()+","+bean.getIs_web()+","+bean.getAs_org()+","+bean.getIsp()+"\n";
+            writer.write(csv_info);
+        }
+        writer.close();
+        writer.flush();
     }
 
     //自动翻页实现--获取剩余数据监听事件后续触发
@@ -357,8 +406,16 @@ public class Controller {
                     jsonBean.setStatus_code(arr_json_element.getString("status_code"));
                     jsonBean.setComponent(component);
                     jsonBean.setCompany(arr_json_element.getString("company"));
+                    jsonBean.setNumber(arr_json_element.getString("number"));
+                    jsonBean.setCountry(arr_json_element.getString("country"));
+                    jsonBean.setProvince(arr_json_element.getString("province"));
+                    jsonBean.setCity(arr_json_element.getString("city"));
+                    jsonBean.setUpdated_at(arr_json_element.getString("updated_at"));
+                    jsonBean.setIs_web(arr_json_element.getString("is_web"));
+                    jsonBean.setAs_org(arr_json_element.getString("as_org"));
+                    jsonBean.setIsp(arr_json_element.getString("isp"));
                     num_id+=1;
-                    result_list.add(new JsonBean(jsonBean.getId(),jsonBean.getUrl(), jsonBean.getIp(), jsonBean.getPort(), jsonBean.getWeb_title(), jsonBean.getDomain(), jsonBean.getBase_protocol(), jsonBean.getProtocol(), jsonBean.getStatus_code(), jsonBean.getComponent(), jsonBean.getCompany()));
+                    result_list.add(new JsonBean(jsonBean.getNumber(),jsonBean.getCountry(),jsonBean.getProvince(),jsonBean.getCity(),jsonBean.getUpdated_at(),jsonBean.getIs_web(),jsonBean.getAs_org(),jsonBean.getIsp(),jsonBean.getId(), jsonBean.getUrl(), jsonBean.getIp(), jsonBean.getPort(), jsonBean.getWeb_title(), jsonBean.getDomain(), jsonBean.getBase_protocol(), jsonBean.getProtocol(), jsonBean.getStatus_code(), jsonBean.getComponent(), jsonBean.getCompany()));
                     result_table.setItems(result_list);
                 }
                 return result_list;
@@ -398,7 +455,7 @@ public class Controller {
 
     //apikey模块
     private void addApiKey(){
-        AnchorPane api_key_pane;
+
         try {
             api_key_pane=FXMLLoader.load(getClass().getResource("/fxml/ApiKey.fxml"));
         } catch (IOException e) {
@@ -406,7 +463,7 @@ public class Controller {
         }
         JFXButton backbutton = (JFXButton)api_key_pane.lookup("#key_back");
         JFXButton cancelbutton = (JFXButton)api_key_pane.lookup("#cancel_button");
-        TextField hunter_key = (TextField) api_key_pane.lookup("#hunter_key");
+        hunter_key = (TextField) api_key_pane.lookup("#hunter_key");
         apikey.setOnAction(event -> {
             Alert api_key_dialog = new Alert(Alert.AlertType.NONE);
             api_key_dialog.setResizable(true);
@@ -460,9 +517,8 @@ public class Controller {
             api_key_dialog.getDialogPane().setContent(api_key_pane);
             api_key_dialog.showAndWait();
         });
-
-        //写入文件
     }
+
 
     //代理模块
     private void addProxy(){
@@ -576,5 +632,97 @@ public class Controller {
                 }
             }
         });
+    }
+
+
+    @FXML
+    private void batchQuery() throws NoSuchAlgorithmException, IOException, NoSuchProviderException, KeyManagementException {
+        if (hunter_key.getText().trim().equals("")){
+            Properties properties = new Properties();
+            try {
+                FileInputStream fis = new FileInputStream("Hunter.properties");
+                properties.load(fis);
+                fis.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            if (!properties.getProperty("Hunter_Key").equals("")){
+                hunter_key.setText(properties.getProperty("Hunter_Key"));
+                key=hunter_key.getText().trim();
+            }else {ResultTool.alert("请填写Api-Key!!");}
+        }
+
+        if (hunter_search_grammar.getText().trim().equals("")){
+            ResultTool.alert("搜索语法不能为空！！");
+        }else {
+            this.grammar=hunter_search_grammar.getText().trim();
+        }
+        if (hunter_status_code.getText().equals("默认200 逗号分割")){
+            this.code ="200";
+        }else {
+            this.code = hunter_status_code.getText().trim();
+        }
+
+        this.isweb_str = this.hunter_is_web.getValue().trim();
+        if (isweb_str.equals("Web资产")) {
+            isweb_int = "1";
+        } else if (isweb_str.equals("非Web资产")) {
+            isweb_int = "2";
+        } else {
+            isweb_int = "3";
+        }
+
+        this.bs64_grammar = Base64.getUrlEncoder().encodeToString(grammar.getBytes());
+
+
+        //资产时间处理
+        Date date = new Date();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd%20hh:mm:ss");
+        String now = simpleDateFormat.format(date);
+        String month = simpleDateFormat.format(new Date(date.getTime() - 31L * 24 * 60 * 60 * 1000));
+        String half_year = simpleDateFormat.format(new Date(date.getTime() - 186L * 24 * 60 * 60 * 1000));
+        String one_year = simpleDateFormat.format(new Date(date.getTime() - 366L * 24 * 60 * 60 * 1000));
+
+        if (hunter_time.getValue().trim().equals("最近一个月")) {
+            starttime = month;
+            endtime = now;
+        } else if (hunter_time.getValue().trim().equals("最近半年")) {
+            starttime = half_year;
+            endtime = now;
+        } else if (hunter_time.getValue().trim().equals("最近一年")) {
+            starttime = one_year;
+            endtime = now;
+        }
+
+        String random_str = ResultTool.getRandomStr(16);
+        String filename = ResultTool.getRandomStr(4);
+        String batchip = batchArea.getText();
+        String batchdata = "--------------------------"+random_str+"\r\n" +
+                "Content-Disposition: form-data; name=\"file\"; filename=\""+filename+".csv\"\r\n" +
+                "Content-Type: application/octet-stream\r\n" +
+                "\r\n"+
+                batchip+
+                "\r\n"+
+                "--------------------------"+random_str+"--\r\n";
+        String url = "https://hunter.qianxin.com/openApi/search/batch?api-key="+key+"&search="+bs64_grammar+"&is_web="+isweb_int+"&status_code="+code+"&start_time="+"%22"+starttime+"%22"+"&end_time="+"%22"+endtime+"%22";
+        this.headers.put("Content-Type","multipart/form-data; boundary=------------------------"+random_str);
+        Response response = HttpTool.post(url,this.headers,batchdata);
+        String resp_json = response.getText();
+        JSONObject jsonObject = JSONObject.parseObject(resp_json).getJSONObject("data");
+        task_id = jsonObject.getString("task_id");
+    }
+
+    @FXML
+    private void batchExport() throws NoSuchAlgorithmException, IOException, NoSuchProviderException, KeyManagementException {
+        String url = "https://hunter.qianxin.com/openApi/search/download/"+task_id+"?api-key="+key;
+        Response response = HttpTool.get(url,this.headers);
+        FileChooser fileChooser = new FileChooser();
+        FileChooser.ExtensionFilter extensionFilter = new FileChooser.ExtensionFilter("CSV files (*.csv)", "*.csv");
+        fileChooser.setTitle("请选择保存路径");
+        fileChooser.getExtensionFilters().add(extensionFilter);
+        File file = fileChooser.showSaveDialog(new Stage());
+        Writer writer = new BufferedWriter(new FileWriter(file));
+        writer.write(response.getText());
+        writer.close();
     }
 }

@@ -9,6 +9,8 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.Alert;
 import javafx.stage.Window;
 
+import java.util.Random;
+
 
 public class ResultTool {
     private String component_name;
@@ -42,7 +44,15 @@ public class ResultTool {
             jsonBean.setStatus_code(arr_json_element.getString("status_code"));
             jsonBean.setComponent(component);
             jsonBean.setCompany(arr_json_element.getString("company"));
-            result_list.add(new JsonBean(jsonBean.getId(), jsonBean.getUrl(), jsonBean.getIp(), jsonBean.getPort(), jsonBean.getWeb_title(), jsonBean.getDomain(), jsonBean.getBase_protocol(), jsonBean.getProtocol(), jsonBean.getStatus_code(), jsonBean.getComponent(), jsonBean.getCompany()));
+            jsonBean.setNumber(arr_json_element.getString("number"));
+            jsonBean.setCountry(arr_json_element.getString("country"));
+            jsonBean.setProvince(arr_json_element.getString("province"));
+            jsonBean.setCity(arr_json_element.getString("city"));
+            jsonBean.setUpdated_at(arr_json_element.getString("updated_at"));
+            jsonBean.setIs_web(arr_json_element.getString("is_web"));
+            jsonBean.setAs_org(arr_json_element.getString("as_org"));
+            jsonBean.setIsp(arr_json_element.getString("isp"));
+            result_list.add(new JsonBean(jsonBean.getNumber(),jsonBean.getCountry(),jsonBean.getProvince(),jsonBean.getCity(),jsonBean.getUpdated_at(),jsonBean.getIs_web(),jsonBean.getAs_org(),jsonBean.getIsp(),jsonBean.getId(), jsonBean.getUrl(), jsonBean.getIp(), jsonBean.getPort(), jsonBean.getWeb_title(), jsonBean.getDomain(), jsonBean.getBase_protocol(), jsonBean.getProtocol(), jsonBean.getStatus_code(), jsonBean.getComponent(), jsonBean.getCompany()));
         }
         return result_list;
     }
@@ -56,5 +66,18 @@ public class ResultTool {
         });
         alert.setHeaderText(alert_info);
         alert.show();
+    }
+
+    //生成随机字符串
+    public static String getRandomStr(int length){
+        String str = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        Random random =new Random();
+        StringBuffer stringBuffer = new StringBuffer();
+
+        for (int i=0; i < length; ++i){
+            int number = random.nextInt(62);   //随机产生0-61之间的一个数字
+            stringBuffer.append(str.charAt(number));   //根据0-61索引的取字符添加进stringBuffer中
+        }
+        return stringBuffer.toString();
     }
 }
