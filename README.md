@@ -3,6 +3,8 @@ TKHunter是一款Hunter资产测绘平台的图形化工具（深信服深蓝实
 
 PS：时间仓促，欢迎师傅们提issues（QAQ）
 
+Maven打包方式使用：mvn package assembly:single
+
 ![image](https://user-images.githubusercontent.com/113674835/190915582-333c1c44-caa8-497a-b9d6-c0318dfb8867.png)
 
 ![image](https://user-images.githubusercontent.com/113674835/190915598-06e69873-21b1-4c8f-a29d-46b9643fa4f8.png)
