@@ -36,6 +36,7 @@ import javafx.util.Duration;
 import java.awt.*;
 import java.io.*;
 import java.net.*;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
@@ -206,7 +207,6 @@ public class Controller {
         grammar_content.setCellValueFactory(new PropertyValueFactory<>("content"));
         grammar_explain.setCellValueFactory(new PropertyValueFactory<>("explain"));
         grammar_table.setItems(grammar_list);
-
         //加载自定义时间范围
         customDate();
 
@@ -257,7 +257,7 @@ public class Controller {
             isweb_int = "3";
         }
 
-        this.bs64_grammar = Base64.getUrlEncoder().encodeToString(grammar.getBytes());
+        this.bs64_grammar = Base64.getUrlEncoder().encodeToString(grammar.getBytes(StandardCharsets.UTF_8));
 
 
         //资产时间处理
@@ -281,8 +281,6 @@ public class Controller {
 
 
         String result_json = new HunterSearch().getResult(key, bs64_grammar, isweb_int, 1, code, starttime, endtime);
-
-
         if (result_json.contains("令牌过期")){
             ResultTool.alert("令牌过期，请输入有效的Key");
         }
@@ -296,7 +294,7 @@ public class Controller {
         result_ip.setCellValueFactory(new PropertyValueFactory<>("ip"));
         result_url.setCellValueFactory(new PropertyValueFactory<>("url"));
         result_port.setCellValueFactory(new PropertyValueFactory<>("port"));
-        result_web_title.setCellValueFactory(new PropertyValueFactory<>("web_title"));
+        result_web_title.setCellValueFactory(new PropertyValueFactory<>(new String("web_title".getBytes(StandardCharsets.UTF_8))));
         result_domain.setCellValueFactory(new PropertyValueFactory<>("domain"));
         result_protocol.setCellValueFactory(new PropertyValueFactory<>("protocol"));
         result_base_protocol.setCellValueFactory(new PropertyValueFactory<>("base_protocol"));
@@ -421,7 +419,7 @@ public class Controller {
                 return result_list;
             }
         };
-        tableView.scrollTo(tableView.getItems().size()-20);
+        tableView.scrollTo(tableView.getItems().size()-10);
         new Thread(task).start();
     }
 

@@ -7,13 +7,11 @@ import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.Proxy;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
@@ -48,13 +46,13 @@ public class HttpTool {
 
     //返回数据流处理
     public static String streamToString(InputStream inputStream) throws IOException {
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        int len;
-        byte[] bytes = new byte[1024];
-        while ((len=inputStream.read(bytes))!=-1){
-            byteArrayOutputStream.write(bytes,0,len);
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
+        StringBuffer stringBuffer = new StringBuffer();
+        String line;
+        while ((line=bufferedReader.readLine())!=null){
+            stringBuffer.append(line);
         }
-        return byteArrayOutputStream.toString();
+        return stringBuffer.toString();
     }
 
     public static Response get(String url, HashMap<String, String> headers) throws NoSuchAlgorithmException, IOException, NoSuchProviderException, KeyManagementException {
@@ -65,7 +63,7 @@ public class HttpTool {
         return response;
     }
 
-    public static Response post(String url,HashMap<String,String> headers,String postdata) throws NoSuchAlgorithmException, IOException, NoSuchProviderException, KeyManagementException {
+    public static Response post(String url,HashMap<String,String> headers, String postdata) throws NoSuchAlgorithmException, IOException, NoSuchProviderException, KeyManagementException {
         Response response;
         HttpURLConnection connection = getConn(url);
         connection.setRequestMethod("POST");
@@ -87,7 +85,6 @@ public class HttpTool {
         response.setCode(connection.getResponseCode());
         response.setHeader(connection.getHeaderFields().toString());
         response.setText(streamToString(connection.getInputStream()));
-
         return response;
     }
 }

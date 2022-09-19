@@ -6,7 +6,7 @@
 
     <groupId>com.tkteam</groupId>
     <artifactId>TKHunter</artifactId>
-    <version>1.1</version>
+    <version>1.2</version>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
@@ -21,7 +21,6 @@
             <artifactId>jfoenix</artifactId>
             <version>8.0.10</version>
         </dependency>
-
         <dependency>
             <groupId>com.alibaba.fastjson2</groupId>
             <artifactId>fastjson2</artifactId>

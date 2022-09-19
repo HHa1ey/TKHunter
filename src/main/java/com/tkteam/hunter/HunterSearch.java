@@ -1,16 +1,12 @@
 package com.tkteam.hunter;
 
 
-import com.tkteam.controller.Controller;
 import com.tkteam.utils.HttpTool;
-import com.tkteam.utils.ResultTool;
-import com.tkteam.utils.TrustCert;
-import com.tkteam.utils.UserAgentTools;
+
 import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
-import java.security.SecureRandom;
 import java.util.HashMap;
 
 public class HunterSearch {
