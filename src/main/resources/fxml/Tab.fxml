@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane prefHeight="575.0" prefWidth="1119.0" stylesheets="/css/main.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
+    <TableView fx:id="tableView" layoutX="4.0" layoutY="1.0" prefHeight="568.0" prefWidth="1285.0">
+      <columns>
+          <TableColumn fx:id="result_id" prefWidth="59.0" text="序号" />
+          <TableColumn fx:id="result_web_title" prefWidth="187.0" text="站点标题" />
+          <TableColumn fx:id="result_status_code" prefWidth="57.0" text="状态码" />
+          <TableColumn fx:id="result_url" prefWidth="146.0" text="URL" />
+          <TableColumn fx:id="result_ip" prefWidth="117.0" text="IP" />
+          <TableColumn fx:id="result_port" prefWidth="75.0" text="端口" />
+          <TableColumn fx:id="result_domain" prefWidth="123.0" text="域名" />
+          <TableColumn fx:id="result_protocol" prefWidth="65.0" text="协议" />
+          <TableColumn fx:id="result_base_protocol" prefWidth="85.0" text="基本协议" />
+          <TableColumn fx:id="result_component" prefWidth="154.0" text="服务器指纹" />
+          <TableColumn fx:id="result_company" prefWidth="221.0" text="ICP" />
+      </columns>
+    </TableView>
+    <AnchorPane layoutY="569.0" prefHeight="0.0" prefWidth="1296.0" />
+     <Text fx:id="result_num" layoutX="899.0" layoutY="586.0" strokeType="OUTSIDE" strokeWidth="0.0" text="查询数据总量：" wrappingWidth="356.30029296875" />
+</AnchorPane>

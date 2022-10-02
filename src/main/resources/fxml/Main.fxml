@@ -50,12 +50,12 @@
       <JFXTextField fx:id="hunter_status_code" layoutX="691.0" layoutY="107.0" prefHeight="30.0" prefWidth="144.0" text="默认200 逗号分割" />
       <TextField fx:id="hunter_search_grammar" layoutX="148.0" layoutY="37.0" prefHeight="30.0" prefWidth="460.0" />
       <JFXButton layoutX="674.0" layoutY="16.0" onAction="#hunterSearch" prefHeight="36.0" prefWidth="89.0" text="查询" />
-      <JFXButton layoutX="1084.0" layoutY="16.0" onAction="#exportCsv" prefHeight="36.0" prefWidth="169.0" text="语法查询结果导出" />
+      <JFXButton fx:id="exportButton" layoutX="1084.0" layoutY="16.0" prefHeight="36.0" prefWidth="169.0" text="语法查询结果导出" />
       <TextArea fx:id="batchArea" layoutX="856.0" layoutY="11.0" prefHeight="132.0" prefWidth="200.0" />
       <JFXButton layoutX="1084.0" layoutY="86.0" onAction="#batchExport" prefHeight="36.0" prefWidth="169.0" text="批量查询结果导出" />
       <JFXButton layoutX="674.0" layoutY="59.0" onAction="#batchQuery" prefHeight="36.0" prefWidth="89.0" text="批量查询" />
    </AnchorPane>
-   <JFXTabPane prefHeight="649.0" prefWidth="1119.0">
+   <JFXTabPane fx:id="resultTabPane" prefHeight="649.0" prefWidth="1119.0" tabClosingPolicy="ALL_TABS">
       <Tab text="常用查询语法">
          <TableView fx:id="grammar_table" prefHeight="575.0" prefWidth="1119.0">
             <columns>
@@ -64,26 +64,5 @@
             </columns>
          </TableView>
       </Tab>
-      <Tab text="查询结果">
-         <TableView fx:id="result_table" prefHeight="200.0" prefWidth="1167.0">
-            <columns>
-               <TableColumn fx:id="result_id" prefWidth="59.0" text="序号" />
-               <TableColumn fx:id="result_web_title" prefWidth="187.0" text="站点标题" />
-               <TableColumn fx:id="result_status_code" prefWidth="57.0" text="状态码" />
-               <TableColumn fx:id="result_url" prefWidth="121.0" text="URL" />
-               <TableColumn fx:id="result_ip" prefWidth="109.0" text="IP" />
-               <TableColumn fx:id="result_port" prefWidth="65.0" text="端口" />
-               <TableColumn fx:id="result_domain" prefWidth="166.0" text="域名" />
-               <TableColumn fx:id="result_protocol" prefWidth="65.0" text="协议" />
-               <TableColumn fx:id="result_base_protocol" prefWidth="85.0" text="基本协议" />
-               <TableColumn fx:id="result_component" prefWidth="145.0" text="服务器指纹" />
-               <TableColumn fx:id="result_company" prefWidth="217.0" text="ICP" />
-            </columns>
-         </TableView>
-      </Tab>
    </JFXTabPane>
-   <AnchorPane prefHeight="52.0" prefWidth="1119.0">
-      <Text layoutX="992.0" layoutY="25.0" strokeType="OUTSIDE" strokeWidth="0.0" text="查询结果数量：" />
-      <Text fx:id="result_num" layoutX="1112.0" layoutY="25.0" strokeType="OUTSIDE" strokeWidth="0.0" text="0条" wrappingWidth="64.30029296875" />
-   </AnchorPane>
 </VBox>

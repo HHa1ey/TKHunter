@@ -11,7 +11,6 @@ public class JsonBean {
     private  String status_code;
     private  String component;
     private  String company;
-    private int id;
     private String number;
     private String country;
     private String province;
@@ -21,8 +20,7 @@ public class JsonBean {
     private String as_org;
     private String isp;
 
-    public JsonBean(String number,String country,String province,String city,String updated_at,String is_web,String as_org,String isp,int id,String url, String ip, String port, String web_title, String domain, String base_protocol, String protocol, String status_code, String component,String company) {
-        this.id=id;
+    public JsonBean(String number,String country,String province,String city,String updated_at,String is_web,String as_org,String isp,String url, String ip, String port, String web_title, String domain, String base_protocol, String protocol, String status_code, String component,String company) {
         this.url = url;
         this.ip = ip;
         this.port = port;
@@ -109,14 +107,6 @@ public class JsonBean {
     }
     public void setCompany(String company){
         this.company=company;
-    }
-
-    public void setId(int id) {
-        this.id=id;
-    }
-
-    public int getId() {
-        return this.id;
     }
 
     public String getNumber() {
