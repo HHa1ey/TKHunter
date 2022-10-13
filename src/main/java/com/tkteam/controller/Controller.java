@@ -10,8 +10,6 @@ import com.tkteam.hunter.HunterSearch;
 import com.tkteam.utils.HttpTool;
 import com.tkteam.utils.ResultTool;
 import javafx.animation.PauseTransition;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -49,8 +47,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class Controller {
     public static HashMap<String,Object> setProxy=new HashMap<>();
-    @FXML
-    private JFXButton exportButton;
+
     @FXML
     private JFXTabPane resultTabPane;
     @FXML
@@ -91,6 +88,7 @@ public class Controller {
     private TextField hunter_key;
 
     private String task_id;
+    private String batchQueryURL;
 
     //is_web选择资产类型
     private static final String[] is_webs = {
@@ -167,7 +165,6 @@ public class Controller {
             endtime = now;
         }
         handleData();
-        exportFile();
     }
 
 
@@ -264,52 +261,46 @@ public class Controller {
         });
     }
 
+    @FXML
     private void exportFile(){
-        resultTabPane.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Tab>() {
-            @Override
-            public void changed(ObservableValue<? extends Tab> observable, Tab oldValue, Tab newValue) {
-                TableView<JsonBean> tableView = (TableView<JsonBean>) resultTabPane.getSelectionModel().getSelectedItem().getContent().lookup("#tableView");
-                exportButton.setOnAction(event -> {
-                    ObservableList<JsonBean> exportData = FXCollections.observableArrayList();
-                    exportData.addAll(tableView.getItems());
-                    //文件导出实现
-                    FileChooser fileChooser = new FileChooser();
-                    FileChooser.ExtensionFilter extensionFilter = new FileChooser.ExtensionFilter("CSV files (*.csv)", "*.csv");
-                    fileChooser.setTitle("选择导出CSV路径");
-                    fileChooser.getExtensionFilters().add(extensionFilter);
-                    File file = fileChooser.showSaveDialog(new Stage());
-                    Writer writer;
-                    try {
-                        writer = new BufferedWriter(new FileWriter(file));
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                    try {
-                        writer.write("URL"+","+"IP"+","+"端口"+","+"Web_title"+","+"domain"+","+"protocol"+","+"base_protocol"+","+"状态码"+","+"中间件"+","+"ICP公司名"+","+"备案号"+","+"国家"+","+"省"+","+"市"+","+"更新时间"+","+"是否是Web资产"+","+"as_org"+","+"ISP"+"\n");
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                    for (JsonBean bean : exportData){
-                        String csv_info = bean.getUrl()+","+bean.getIp()+","+bean.getPort()+","+bean.getWeb_title()+","+bean.getDomain()+","+bean.getProtocol()+","+bean.getBase_protocol()+","+bean.getStatus_code()+","+bean.getComponent()+","+bean.getCompany()+","+bean.getNumber()+","+bean.getCountry()+","+bean.getProvince()+","+bean.getCity()+","+bean.getUpdated_at()+","+bean.getIs_web()+","+bean.getAs_org()+","+bean.getIsp()+"\n";
-                        try {
-                            writer.write(csv_info);
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
-                    try {
-                        writer.flush();
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                    try {
-                        writer.close();
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
+        TableView<JsonBean> tableView = (TableView<JsonBean>) resultTabPane.getSelectionModel().getSelectedItem().getContent().lookup("#tableView");
+        ObservableList<JsonBean> exportData = FXCollections.observableArrayList();
+        exportData.addAll(tableView.getItems());
+        //文件导出实现
+        FileChooser fileChooser = new FileChooser();
+        FileChooser.ExtensionFilter extensionFilter = new FileChooser.ExtensionFilter("CSV files (*.csv)", "*.csv");
+        fileChooser.setTitle("选择导出CSV路径");
+        fileChooser.getExtensionFilters().add(extensionFilter);
+        File file = fileChooser.showSaveDialog(new Stage());
+        OutputStreamWriter osw;
+        try {
+            osw = new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            osw.write("URL"+","+"IP"+","+"端口"+","+"Web_title"+","+"domain"+","+"protocol"+","+"base_protocol"+","+"状态码"+","+"中间件"+","+"ICP公司名"+","+"备案号"+","+"国家"+","+"省"+","+"市"+","+"更新时间"+","+"是否是Web资产"+","+"as_org"+","+"ISP"+"\n");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        for (JsonBean bean : exportData){
+            String csv_info = bean.getUrl()+","+bean.getIp()+","+bean.getPort()+","+bean.getWeb_title()+","+bean.getDomain()+","+bean.getProtocol()+","+bean.getBase_protocol()+","+bean.getStatus_code()+","+bean.getComponent()+","+bean.getCompany()+","+bean.getNumber()+","+bean.getCountry()+","+bean.getProvince()+","+bean.getCity()+","+bean.getUpdated_at()+","+bean.getIs_web()+","+bean.getAs_org()+","+bean.getIsp()+"\n";
+            try {
+                osw.write(csv_info);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
-        });
+        }
+        try {
+            osw.flush();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            osw.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     //代理模块
@@ -443,11 +434,10 @@ public class Controller {
             }else {ResultTool.alert("请填写Api-Key!!");}
         }
 
-        if (hunter_search_grammar.getText().trim().equals("")){
-            ResultTool.alert("搜索语法不能为空！！");
-        }else {
-            this.grammar=hunter_search_grammar.getText().trim();
+        if (batchArea.getText().equals("")){
+            ResultTool.alert("批量查询不能为空");
         }
+
         if (hunter_status_code.getText().equals("默认200 逗号分割")){
             this.code ="200";
         }else {
@@ -463,9 +453,6 @@ public class Controller {
             isweb_int = "3";
         }
 
-        this.bs64_grammar = Base64.getUrlEncoder().encodeToString(grammar.getBytes());
-
-
         //资产时间处理
         Date date = new Date();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd%20hh:mm:ss");
@@ -473,7 +460,6 @@ public class Controller {
         String month = simpleDateFormat.format(new Date(date.getTime() - 31L * 24 * 60 * 60 * 1000));
         String half_year = simpleDateFormat.format(new Date(date.getTime() - 186L * 24 * 60 * 60 * 1000));
         String one_year = simpleDateFormat.format(new Date(date.getTime() - 366L * 24 * 60 * 60 * 1000));
-
         if (hunter_time.getValue().trim().equals("最近一个月")) {
             starttime = month;
             endtime = now;
@@ -485,6 +471,13 @@ public class Controller {
             endtime = now;
         }
 
+        if (!hunter_search_grammar.getText().trim().equals("")){
+            this.grammar=hunter_search_grammar.getText().trim();
+            this.bs64_grammar = Base64.getUrlEncoder().encodeToString(grammar.getBytes());
+            this.batchQueryURL = "https://hunter.qianxin.com/openApi/search/batch?api-key="+key+"&search="+bs64_grammar+"&is_web="+isweb_int+"&status_code="+code+"&start_time="+"%22"+starttime+"%22"+"&end_time="+"%22"+endtime+"%22";
+        }else {
+            this.batchQueryURL = "https://hunter.qianxin.com/openApi/search/batch?api-key=" + key + "&is_web=" + isweb_int + "&status_code=" + code + "&start_time=" + "%22" + starttime + "%22" + "&end_time=" + "%22" + endtime + "%22";
+        }
         String random_str = ResultTool.getRandomStr(16);
         String filename = ResultTool.getRandomStr(4);
         String batchip = batchArea.getText();
@@ -495,9 +488,9 @@ public class Controller {
                 batchip+
                 "\r\n"+
                 "--------------------------"+random_str+"--\r\n";
-        String url = "https://hunter.qianxin.com/openApi/search/batch?api-key="+key+"&search="+bs64_grammar+"&is_web="+isweb_int+"&status_code="+code+"&start_time="+"%22"+starttime+"%22"+"&end_time="+"%22"+endtime+"%22";
+
         this.headers.put("Content-Type","multipart/form-data; boundary=------------------------"+random_str);
-        Response response = HttpTool.post(url,this.headers,batchdata);
+        Response response = HttpTool.post(this.batchQueryURL,this.headers,batchdata);
         String resp_json = response.getText();
         JSONObject jsonObject = JSONObject.parseObject(resp_json).getJSONObject("data");
         task_id = jsonObject.getString("task_id");
@@ -505,16 +498,21 @@ public class Controller {
 
     @FXML
     private void batchExport() throws NoSuchAlgorithmException, IOException, NoSuchProviderException, KeyManagementException {
-        String url = "https://hunter.qianxin.com/openApi/search/download/"+task_id+"?api-key="+key;
-        Response response = HttpTool.get(url,this.headers);
-        FileChooser fileChooser = new FileChooser();
-        FileChooser.ExtensionFilter extensionFilter = new FileChooser.ExtensionFilter("CSV files (*.csv)", "*.csv");
-        fileChooser.setTitle("请选择保存路径");
-        fileChooser.getExtensionFilters().add(extensionFilter);
-        File file = fileChooser.showSaveDialog(new Stage());
-        Writer writer = new BufferedWriter(new FileWriter(file));
-        writer.write(response.getText());
-        writer.close();
+        if (task_id!=null){
+            String url = "https://hunter.qianxin.com/openApi/search/download/"+task_id+"?api-key="+key;
+            Response response = HttpTool.get(url,this.headers);
+            FileChooser fileChooser = new FileChooser();
+            FileChooser.ExtensionFilter extensionFilter = new FileChooser.ExtensionFilter("CSV files (*.csv)", "*.csv");
+            fileChooser.setTitle("请选择保存路径");
+            fileChooser.getExtensionFilters().add(extensionFilter);
+            File file = fileChooser.showSaveDialog(new Stage());
+            OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(file),"UTF-8");
+            osw.write(response.getText());
+            osw.close();
+        }else {
+            ResultTool.alert("请先通过批量查询获取task_id值");
+        }
+
     }
 
     public void initialize() {
@@ -526,6 +524,7 @@ public class Controller {
         for (String time : times) {
             this.hunter_time.getItems().add(time);
         }
+
 
         //常用语法查询
         ObservableList<ColumnBean> grammar_list = FXCollections.observableArrayList();
@@ -788,14 +787,12 @@ public class Controller {
                                 return result_list;
                             }
                         };
-                        tableView.scrollTo(tableView.getItems().size()-10);
+                        tableView.scrollTo(tableView.getItems().size()-40);
                         new Thread(task).start();
                     }
                 }
             }));
         });
         pauseTransition.playFromStart();
-
-
     }
 }

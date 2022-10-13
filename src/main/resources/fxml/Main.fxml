@@ -50,7 +50,7 @@
       <JFXTextField fx:id="hunter_status_code" layoutX="691.0" layoutY="107.0" prefHeight="30.0" prefWidth="144.0" text="默认200 逗号分割" />
       <TextField fx:id="hunter_search_grammar" layoutX="148.0" layoutY="37.0" prefHeight="30.0" prefWidth="460.0" />
       <JFXButton layoutX="674.0" layoutY="16.0" onAction="#hunterSearch" prefHeight="36.0" prefWidth="89.0" text="查询" />
-      <JFXButton fx:id="exportButton" layoutX="1084.0" layoutY="16.0" prefHeight="36.0" prefWidth="169.0" text="语法查询结果导出" />
+      <JFXButton layoutX="1084.0" layoutY="16.0" onAction="#exportFile" prefHeight="36.0" prefWidth="169.0" text="语法查询结果导出" />
       <TextArea fx:id="batchArea" layoutX="856.0" layoutY="11.0" prefHeight="132.0" prefWidth="200.0" />
       <JFXButton layoutX="1084.0" layoutY="86.0" onAction="#batchExport" prefHeight="36.0" prefWidth="169.0" text="批量查询结果导出" />
       <JFXButton layoutX="674.0" layoutY="59.0" onAction="#batchQuery" prefHeight="36.0" prefWidth="89.0" text="批量查询" />

@@ -6,7 +6,7 @@
 
     <groupId>com.tkteam</groupId>
     <artifactId>TKHunter</artifactId>
-    <version>1.5</version>
+    <version>1.7</version>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
