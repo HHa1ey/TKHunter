@@ -274,7 +274,12 @@ public class Controller {
         File file = fileChooser.showSaveDialog(new Stage());
         OutputStreamWriter osw;
         try {
-            osw = new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8);
+            FileOutputStream fos = new FileOutputStream(file);
+            //追加BOM标识
+            fos.write(0xef);
+            fos.write(0xbb);
+            fos.write(0xbf);
+            osw = new OutputStreamWriter(fos, StandardCharsets.UTF_8);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -506,7 +511,12 @@ public class Controller {
             fileChooser.setTitle("请选择保存路径");
             fileChooser.getExtensionFilters().add(extensionFilter);
             File file = fileChooser.showSaveDialog(new Stage());
-            OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(file),"UTF-8");
+            FileOutputStream fos = new FileOutputStream(file);
+            //追加BOM标识
+            fos.write(0xef);
+            fos.write(0xbb);
+            fos.write(0xbf);
+            OutputStreamWriter osw = new OutputStreamWriter(fos,"UTF-8");
             osw.write(response.getText());
             osw.close();
         }else {
